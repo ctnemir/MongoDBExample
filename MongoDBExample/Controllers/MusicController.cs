@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MongoDBExample.Models;
 using MongoDBExample.Services;
 
 namespace MongoDBExample.Controllers
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     public class MusicController : Controller
     {
