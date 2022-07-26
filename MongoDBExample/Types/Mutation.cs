@@ -5,19 +5,24 @@ namespace MongoDBExample.Types
 {
     public class Mutation
     {
-        public User create([Service] UserService userService, string name, string email, string password)
+        public async Task<User> create([Service] UserService userService, string name, string email, string password)
         {
             User user = new User();
             user.Name = name;
             user.Email = email;
             user.Password = password;
-            userService.Create(user);
+            await userService.Create(user);
             return user;
         } 
 
-        public string login([Service] UserService userService, LoginInput loginInput)
+        public async Task<String> createRole([Service] UserService userService, string name)
         {
-            return userService.Login(loginInput);
+            return await userService.CreateRole(name);
+        }
+
+        public async Task<string> login([Service] UserService userService, LoginInput loginInput)
+        {
+            return await userService.Login(loginInput);
         }
     }
 }

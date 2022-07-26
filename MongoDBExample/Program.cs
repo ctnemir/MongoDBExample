@@ -13,12 +13,26 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.Configure<MongoDBSettings>(
-   builder.Configuration.GetSection(nameof(MongoDBSettings)));
+   builder.Configuration.GetSection(nameof(MongoDBSettings))
+   );
+
+var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDBSettings)).Get<MongoDBSettings>();
+
+
 builder.Services.AddSingleton<IMongoDBSettings>(sp =>
 sp.GetRequiredService<IOptions<MongoDBSettings>>().Value);
-builder.Services.AddSingleton<UserMusicFavoritesService>();
-builder.Services.AddSingleton<UserService>();
+builder.Services.AddScoped<UserMusicFavoritesService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+    .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
+    (
+        mongoDbSettings.ConnectionString, mongoDbSettings.DatabaseName
+    );
+
+// https://www.yogihosting.com/aspnet-core-identity-mongodb/
 
 builder.Services
     .AddGraphQLServer()
@@ -91,8 +105,6 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-app.UseAuthentication();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -102,6 +114,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
